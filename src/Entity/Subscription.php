@@ -41,6 +41,10 @@ class Subscription
      * @var Collection<int, User>
      */
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'subscription')]
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5184f9f5675fbc54d0e27f4a1e79ffae4f1cd51d
     private Collection $users;
 
     public function __construct()
@@ -85,7 +89,6 @@ class Subscription
     public function setMaxPdf(int $maxPdf): static
     {
         $this->maxPdf = $maxPdf;
-
         return $this;
     }
 
@@ -110,6 +113,10 @@ class Subscription
     {
         $this->specialPrice = $specialPrice;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5184f9f5675fbc54d0e27f4a1e79ffae4f1cd51d
         return $this;
     }
 
@@ -122,6 +129,10 @@ class Subscription
     {
         $this->specialPriceFrom = $specialPriceFrom;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5184f9f5675fbc54d0e27f4a1e79ffae4f1cd51d
         return $this;
     }
 
@@ -134,11 +145,19 @@ class Subscription
     {
         $this->specialPriceTo = $specialPriceTo;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5184f9f5675fbc54d0e27f4a1e79ffae4f1cd51d
         return $this;
     }
 
     /**
      * @return Collection<int, User>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5184f9f5675fbc54d0e27f4a1e79ffae4f1cd51d
      */
     public function getUsers(): Collection
     {
@@ -146,6 +165,10 @@ class Subscription
     }
 
     public function addUser(User $user): static
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5184f9f5675fbc54d0e27f4a1e79ffae4f1cd51d
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
@@ -156,6 +179,10 @@ class Subscription
     }
 
     public function removeUser(User $user): static
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5184f9f5675fbc54d0e27f4a1e79ffae4f1cd51d
     {
         if ($this->users->removeElement($user)) {
             // set the owning side to null (unless already changed)
