@@ -4,6 +4,7 @@ namespace App\Tests\Entity;
 
 use App\Entity\User;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserTest extends TestCase
 {
@@ -12,16 +13,18 @@ class UserTest extends TestCase
         $user = new User();
 
         $email = 'test@test.com';
-        $password = 'password123';
         $roles = ['ROLE_USER'];
 
+        // Simulation d'un mot de passe haché (ex: bcrypt)
+        $hashedPassword = password_hash('test_password', PASSWORD_BCRYPT);
+
         $user->setEmail($email);
-        $user->setPassword($password);
+        $user->setPassword($hashedPassword);
         $user->setRoles($roles);
 
         // Vérification des getters
         $this->assertEquals($email, $user->getEmail());
-        $this->assertEquals($password, $user->getPassword());
+        $this->assertEquals($hashedPassword, $user->getPassword()); // Comparaison avec le hash
         $this->assertEquals($roles, $user->getRoles());
     }
 }
