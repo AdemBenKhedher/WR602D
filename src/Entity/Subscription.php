@@ -25,6 +25,7 @@ class Subscription
     #[ORM\Column]
     private ?int $maxPdf = null;
 
+
     #[ORM\Column]
     private ?float $price = null;
 
@@ -41,6 +42,7 @@ class Subscription
      * @var Collection<int, User>
      */
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'subscription')]
+
     private Collection $users;
 
     public function __construct()
@@ -86,6 +88,7 @@ class Subscription
     {
         $this->maxPdf = $maxPdf;
 
+
         return $this;
     }
 
@@ -110,6 +113,7 @@ class Subscription
     {
         $this->specialPrice = $specialPrice;
 
+
         return $this;
     }
 
@@ -121,6 +125,7 @@ class Subscription
     public function setSpecialPriceFrom(?\DateTimeImmutable $specialPriceFrom): static
     {
         $this->specialPriceFrom = $specialPriceFrom;
+
 
         return $this;
     }
@@ -134,11 +139,13 @@ class Subscription
     {
         $this->specialPriceTo = $specialPriceTo;
 
+
         return $this;
     }
 
     /**
      * @return Collection<int, User>
+
      */
     public function getUsers(): Collection
     {
@@ -146,6 +153,7 @@ class Subscription
     }
 
     public function addUser(User $user): static
+
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
@@ -156,6 +164,7 @@ class Subscription
     }
 
     public function removeUser(User $user): static
+
     {
         if ($this->users->removeElement($user)) {
             // set the owning side to null (unless already changed)
