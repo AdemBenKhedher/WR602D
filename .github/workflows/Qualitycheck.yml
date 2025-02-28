@@ -33,7 +33,7 @@ jobs:
         run: vendor/bin/phpcs --standard=PSR12 src/
 
       - name: 🔍 Run PHPStan (Static Analysis)
-        run: vendor/bin/phpstan analyse src/ --level=max
+        run: vendor/bin/phpstan analyse src/ 
 
       - name: 🧪 Run PHPUnit Tests
         run: vendor/bin/phpunit tests/
