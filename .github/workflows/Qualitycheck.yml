@@ -1,0 +1,42 @@
+name: PHP Quality Checks
+
+on: 
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  php_checks:
+    name: Run PHPStan, PHPCS, PHPUnit & PHPMD
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛠 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🛠 Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, dom, curl, pdo, pdo_mysql
+          tools: composer, phpstan, phpcs, phpunit, phpmd
+
+      - name: 🛠 Install Dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: 🧹 Run PHP_CodeSniffer (PSR-12)
+        run: vendor/bin/phpcs --standard=PSR12 src/
+
+      - name: 🔍 Run PHPStan (Static Analysis)
+        run: vendor/bin/phpstan analyse src/ --level=max
+
+      - name: 🧪 Run PHPUnit Tests
+        run: vendor/bin/phpunit tests/
+
+      - name: 🚨 Run PHPMD (Mess Detector)
+        run: vendor/bin/phpmd src/ text cleancode,codesize,controversial,design
