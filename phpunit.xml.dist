@@ -20,5 +20,5 @@
             <directory>tests</directory>
         </testsuite>
     </testsuites>
+</phpunit>
 
-</phpunit> <!-- Fermeture de la balise phpunit -->
