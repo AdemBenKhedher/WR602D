@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Générer un PDF{% endblock %}
+
+{% block body %}
+    <div class="container my-4">
+        <h1 class="mb-4">Générer un PDF à partir d'un fichier HTML</h1>
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label == 'error' ? 'danger' : label }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Fichier HTML</h5>
+                </div>
+                <div class="card-body">
+                    {{ form_row(form.htmlFile) }}
+                    <small class="form-text text-muted">Sélectionnez un fichier HTML pour générer un PDF.</small>
+                </div>
+            </div>
+
+            <div class="text-center">
+                {{ form_row(form.submit, {'attr': {'class': 'btn btn-primary btn-lg'}}) }}
+            </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
