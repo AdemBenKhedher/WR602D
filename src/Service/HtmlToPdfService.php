@@ -6,6 +6,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class HtmlToPdfService
 {
@@ -15,7 +16,8 @@ class HtmlToPdfService
     {
         $this->client = $client;
     }
-    public function generatePdfFromHtml(string $htmlContent): string
+
+    public function generatePdfFromHtml(string $htmlContent, string $filename): string
     {
         // Endpoint de Gotenberg pour la conversion HTML
         $gotenbergUrl = 'http://gotenberg:3000/forms/chromium/convert/html';
@@ -46,10 +48,15 @@ class HtmlToPdfService
             // Récupérer le contenu du PDF généré
             $pdfContent = $response->getContent();
 
+            // Enregistrer le PDF dans le répertoire public/pdfs
+            $pdfPath = '../src/Pdfs/' . $filename . '.pdf';
+            file_put_contents($pdfPath, $pdfContent);
+
             // Nettoyage du fichier temporaire
             unlink($tempFilename);
 
-            return $pdfContent;
+            // Retourner le chemin du PDF
+            return $pdfPath;
         } catch (\Exception $e) {
             // Assurer le nettoyage même en cas d'erreur
             unlink($tempFilename);

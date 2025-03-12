@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\File;
 use App\Service\HtmlToPdfService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -10,15 +11,20 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Validator\Constraints\File;
+use Doctrine\ORM\EntityManagerInterface;
+use DateTimeImmutable;
+use Symfony\Component\Validator\Constraints\File
+as FileConstraint;
 
 class HtmlController extends AbstractController
 {
     private $pdfService;
+    private $entityManager;
 
-    public function __construct(HtmlToPdfService $pdfService)
+    public function __construct(HtmlToPdfService $pdfService, EntityManagerInterface $entityManager)
     {
         $this->pdfService = $pdfService;
+        $this->entityManager = $entityManager;
     }
 
     #[Route('/html', name: 'generate_pdf')]
@@ -30,7 +36,7 @@ class HtmlController extends AbstractController
                 'label' => 'Fichier HTML',
                 'required' => true,
                 'constraints' => [
-                    new File([
+                    new FileConstraint([
                         'mimeTypes' => ['text/html', 'text/plain', 'application/octet-stream'],
                         'mimeTypesMessage' => 'Veuillez télécharger un fichier HTML valide',
                     ])
@@ -56,19 +62,29 @@ class HtmlController extends AbstractController
                     return $this->redirectToRoute('generate_pdf');
                 }
                 $htmlContent = file_get_contents($htmlFile->getPathname());
-                $pdf = $this->pdfService->generatePdfFromHtml($htmlContent);
 
-                if ($pdf) {
-                    // Retourner directement le PDF dans la réponse HTTP
-                    return new Response(
-                        $pdf,
-                        200,
-                        [
-                            'Content-Type' => 'application/pdf',
-                            'Content-Disposition' => 'inline; filename="generated.pdf"'
-                        ]
-                    );
-                }
+                // Générer le PDF et obtenir le chemin où il est sauvegardé
+                $filename = uniqid('pdf_', true);
+                $pdfPath = $this->pdfService->generatePdfFromHtml($htmlContent, $filename);
+
+                // Enregistrer l'entrée dans la base de données
+                $file = new File();
+                $file->setName($filename . '.pdf');
+                $file->setCreatedAt(new DateTimeImmutable());
+                $file->setUser($this->getUser());
+                // Persister l'entité File dans la base de données
+                $this->entityManager->persist($file);
+                $this->entityManager->flush();
+
+                // Retourner directement le PDF dans la réponse HTTP
+                return new Response(
+                    file_get_contents($pdfPath),
+                    200,
+                    [
+                        'Content-Type' => 'application/pdf',
+                        'Content-Disposition' => 'inline; filename="' . $filename . '.pdf"'
+                    ]
+                );
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Erreur lors de la génération du PDF: ' . $e->getMessage());
             }
