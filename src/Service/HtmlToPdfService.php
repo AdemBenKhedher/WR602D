@@ -20,10 +20,7 @@ class HtmlToPdfService
     {
         $this->client = $client;
         $this->gotenbergUrl = rtrim($params->get('gotenberg_url'), '/') . '/forms/chromium/convert/html';
-
-        
     }
-
     public function generatePdfFromHtml(string $htmlContent, string $filename): string
     {
 
