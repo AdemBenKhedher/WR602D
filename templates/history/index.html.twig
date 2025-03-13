@@ -1,0 +1,28 @@
+
+<h1>Nombre total de PDFs générés : {{ totalCount }}</h1>
+   <h1>Historique de vos PDFs générés</h1>
+
+{% if history is empty %}
+    <p>Aucun PDF généré.</p>
+{% else %}
+    <table>
+        <thead>
+            <tr>
+                <th>Fichier PDF</th>
+                <th>Date de génération</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for file in history %}
+                <tr>
+                    <td>
+                        <a href="{{ asset('Pdfs/' ~ file.name) }}" target="_blank">
+                            Télécharger {{ file.name }}
+                        </a>
+                    </td>
+                    <td>{{ file.createdAt|date('d/m/Y H:i') }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

@@ -49,7 +49,7 @@ class HtmlToPdfService
             $pdfContent = $response->getContent();
 
             // Enregistrer le PDF dans le répertoire public/pdfs
-            $pdfPath = '../src/Pdfs/' . $filename . '.pdf';
+            $pdfPath = '../public/Pdfs/' . $filename . '.pdf';
             file_put_contents($pdfPath, $pdfContent);
 
             // Nettoyage du fichier temporaire
