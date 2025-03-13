@@ -30,7 +30,6 @@ class HtmlController extends AbstractController
     #[Route('/html', name: 'generate_pdf')]
     public function generatePdf(Request $request): Response
     {
-        // Créer le formulaire simplifié pour l'upload de fichier HTML uniquement
         $form = $this->createFormBuilder()
             ->add('htmlFile', FileType::class, [
                 'label' => 'Fichier HTML',
@@ -47,10 +46,8 @@ class HtmlController extends AbstractController
             ])
             ->getForm();
 
-        // Gérer la soumission du formulaire
         $form->handleRequest($request);
 
-        // Si le formulaire est soumis et valide
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
 
@@ -63,20 +60,16 @@ class HtmlController extends AbstractController
                 }
                 $htmlContent = file_get_contents($htmlFile->getPathname());
 
-                // Générer le PDF et obtenir le chemin où il est sauvegardé
                 $filename = uniqid('pdf_', true);
                 $pdfPath = $this->pdfService->generatePdfFromHtml($htmlContent, $filename);
 
-                // Enregistrer l'entrée dans la base de données
                 $file = new File();
                 $file->setName($filename . '.pdf');
                 $file->setCreatedAt(new DateTimeImmutable());
                 $file->setUser($this->getUser());
-                // Persister l'entité File dans la base de données
                 $this->entityManager->persist($file);
                 $this->entityManager->flush();
 
-                // Retourner directement le PDF dans la réponse HTTP
                 return new Response(
                     file_get_contents($pdfPath),
                     200,
@@ -90,7 +83,6 @@ class HtmlController extends AbstractController
             }
         }
 
-        // Afficher le formulaire si non soumis ou invalide
         return $this->render('html/generate_pdf.html.twig', [
             'form' => $form->createView(),
         ]);

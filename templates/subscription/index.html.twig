@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des abonnements{% endblock %}
+
+{% block body %}
+    <h1>Choisir votre abonnement</h1>
+
+    {% if app.user %}
+        <p>Bienvenue, {{ app.user.firstname }}. Vous pouvez changer d'abonnement.</p>
+    {% else %}
+        <p>Vous devez être connecté pour changer d'abonnement.</p>
+    {% endif %}
+
+    <div class="subscriptions">
+        {% if user_subscription %}
+            <p>Abonnement actuel : {{ user_subscription.name }}</p>
+        {% else %}
+            <p>Abonnement actuel : Aucune offre choisie (Basique)</p>
+        {% endif %}
+
+        {% for subscription in subscriptions %}
+            <div class="subscription">
+                <h3>{{ subscription.name }}</h3>
+                <p>{{ subscription.description }}</p>
+                <p>Documents maximum : {{ subscription.maxPdf }}</p>
+
+                {% if subscription.specialPrice %}
+                    <p>Prix: <span style="text-decoration: line-through;">{{ subscription.price }}€</span> 
+                        <span style="color: red;">{{ subscription.specialPrice }}€</span>
+                    </p>
+                    <p>Offre spéciale : Valide du {{ subscription.specialPriceFrom|date('d/m/Y') }} au {{ subscription.specialPriceTo|date('d/m/Y') }}</p>
+                {% else %}
+                    <p>Prix: {{ subscription.price }}€</p>
+                {% endif %}
+
+                {% if user_subscription and user_subscription.id == subscription.id %}
+                    <span>Abonné à cet abonnement</span>
+                {% else %}
+                    {% if subscription.name == 'Basique' %}
+                        {% if user_subscription is null %}
+                            <span>Abonné gratuitement</span>
+                        {% else %}
+                            <a href="{{ path('change_subscription', {'subscriptionId': 'basic'}) }}">Réinitialiser l'abonnement vers l'offre Basique</a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ path('change_subscription', {'subscriptionId': subscription.id}) }}">Changer d'abonnement</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

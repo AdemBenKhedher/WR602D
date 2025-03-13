@@ -48,7 +48,6 @@ class PdfController extends AbstractController
     {
         $url = $request->query->get('url');
 
-        // Génère et retourne directement le PDF (ouvre dans le navigateur)
         return $this->pdfService->generatePdfFromUrl($url);
     }
 }
