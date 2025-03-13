@@ -5,7 +5,11 @@
 {% block body %}
     <div class="container my-4">
         <h1 class="mb-4">Générer un PDF à partir d'un fichier HTML</h1>
-
+    {% if warningMessage %}
+        <div class="alert alert-warning">
+            {{ warningMessage|raw }}
+        </div>
+    {% endif %}
 
 
         {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
