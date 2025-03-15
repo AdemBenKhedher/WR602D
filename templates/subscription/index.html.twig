@@ -24,7 +24,7 @@
                 <p>{{ subscription.description }}</p>
                 <p>Documents maximum : {{ subscription.maxPdf }}</p>
 
-                {% if subscription.specialPrice %}
+                {% if subscription.specialPrice and subscription.specialPriceTo is not null and subscription.specialPriceTo > "now"|date %}
                     <p>Prix: <span style="text-decoration: line-through;">{{ subscription.price }}€</span> 
                         <span style="color: red;">{{ subscription.specialPrice }}€</span>
                     </p>

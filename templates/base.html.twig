@@ -15,9 +15,12 @@
             {% if app.user %}
                 <li><a href="{{ path('app_history') }}">Historique</a></li>
                 <li><a href="{{ path('app_pdf') }}">URL to PDF</a></li>
+                {% if user_subscription is defined and user_subscription is not null %}
                 <li><a href="{{ path('generate_pdf') }}">HTML to PDF</a></li>
+                {% endif %}
                 <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
-                <li><a href="{{path('subscription_page')}}">Subscription</a></li>
+                
+                <li><a href="{{path('subscription_page')}}">Subscriptions</a></li>
                 {% if user_subscription is defined and user_subscription is not null %}
                     <li>Nombre de PDFs générés aujourd'hui : {{ count }} / {{ user_subscription.maxpdf }}</li>
                 {% endif %}

@@ -57,7 +57,7 @@ class HtmlController extends AbstractController
             $warningMessage = 'Vous avez atteint la limite de génération de PDF pour aujourd\'hui. ';
             $warningMessage .= 'Pour augmenter cette limite, veuillez souscrire à un abonnement. ';
             $warningMessage .= '<a href="' . $this->generateUrl('subscription_page') . '"
-            >Cliquez ici pour vous abonner</a>';
+            >Cliquez ici pour Améliorer votre abonnement</a>';
         }
 
         $form = $this->createFormBuilder()
