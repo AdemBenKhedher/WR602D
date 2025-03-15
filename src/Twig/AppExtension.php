@@ -15,8 +15,11 @@ class AppExtension extends AbstractExtension implements GlobalsInterface
     private SubscriptionRepository $subscriptionRepo;
     private FileRepository $fileRepository;
 
-    public function __construct(Security $security, SubscriptionRepository $subscriptionRepo, FileRepository $fileRepository)
-    {
+    public function __construct(
+        Security $security,
+        SubscriptionRepository $subscriptionRepo,
+        FileRepository $fileRepository
+    ) {
         $this->security = $security;
         $this->subscriptionRepo = $subscriptionRepo;
         $this->fileRepository = $fileRepository;
@@ -26,12 +29,15 @@ class AppExtension extends AbstractExtension implements GlobalsInterface
     {
         $user = $this->security->getUser();
         $userSubscription = $user ? $user->getSubscription() : null;
-
-        // Calcul du début et de la fin de la journée
         $startOfDay = new DateTimeImmutable('today midnight');
         $endOfDay = new DateTimeImmutable('tomorrow midnight -1 second');
-
-        $pdfCount = $user ? $this->fileRepository->countPdfGeneratedByUserOnDate($user->getId(), $startOfDay, $endOfDay) : 0;
+        $pdfCount = $user
+            ? $this->fileRepository->countPdfGeneratedByUserOnDate(
+                $user->getId(),
+                $startOfDay,
+                $endOfDay
+            )
+            : 0;
 
         return [
             'user_subscription' => $userSubscription,
