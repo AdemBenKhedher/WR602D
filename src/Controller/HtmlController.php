@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\ORM\EntityManagerInterface;
 use DateTimeImmutable;
@@ -35,12 +36,29 @@ class HtmlController extends AbstractController
     #[Route('/html', name: 'generate_pdf')]
     public function generatePdf(Request $request): Response
     {
+        if (!$this->checkSubscription()) {
+            return $this->redirectToRoute('subscription_page');
+        }
+
+        $form = $this->createPdfForm();
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            return $this->processPdfGeneration($form->getData());
+        }
+
+        return $this->render('html/generate_pdf.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+    private function checkSubscription(): bool
+    {
         $user = $this->getUser();
         $subscription = $user->getSubscription();
 
         if (!$subscription) {
-            $this->addFlash('error', 'Vous devez avoir un abonnement actif pour générer un PDF. ');
-            return $this->redirectToRoute('subscription_page');
+            $this->addFlash('error', 'Vous devez avoir un abonnement actif pour générer un PDF.');
+            return false;
         }
 
         $maxPdf = $subscription->getMaxPdf();
@@ -52,18 +70,18 @@ class HtmlController extends AbstractController
             $endOfDay
         );
 
-        $warningMessage = null;
         if ($pdfsGeneratedToday >= $maxPdf) {
-            $warningMessage = 'Vous avez atteint la limite de génération de PDF pour aujourd\'hui. ';
-            $warningMessage .= 'Pour augmenter cette limite, veuillez souscrire à un abonnement. ';
-            $warningMessage .= '<a href="' . $this->generateUrl('subscription_page') . '"
-            >Cliquez ici pour vous abonner</a>';
+            $this->addFlash('error', 'Vous avez atteint la limite de génération de PDF pour aujourdhui.');
+            return false;
         }
-
-        $form = $this->createFormBuilder()
+        return true;
+    }
+    private function createPdfForm()
+    {
+        return $this->createFormBuilder()
             ->add('htmlFile', FileType::class, [
                 'label' => 'Fichier HTML',
-                'required' => true,
+                'required' => false,
                 'constraints' => [
                     new FileConstraint([
                         'mimeTypes' => ['text/html', 'text/plain', 'application/octet-stream'],
@@ -71,55 +89,59 @@ class HtmlController extends AbstractController
                     ])
                 ],
             ])
+            ->add('htmlCode', TextareaType::class, [
+                'label' => 'Code HTML',
+                'required' => false,
+                'attr' => ['rows' => 10, 'placeholder' => 'Collez votre code HTML ici...']
+            ])
             ->add('submit', SubmitType::class, ['label' => 'Générer PDF'])
             ->getForm();
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-
-            try {
-                /** @var UploadedFile $htmlFile */
-                $htmlFile = $data['htmlFile'];
-                if (!$htmlFile) {
-                    $this->addFlash('error', 'Veuillez télécharger un fichier HTML');
-                    return $this->redirectToRoute('generate_pdf');
-                }
-
-                if ($pdfsGeneratedToday >= $maxPdf) {
-                    $this->addFlash('error', 'Vous avez atteint la limite de génération de PDF pour aujourd\'hui. ' .
-                        'Veuillez souscrire à un abonnement pour générer davantage de PDF.');
-                    return $this->redirectToRoute('subscription_page');
-                }
-
-                $htmlContent = file_get_contents($htmlFile->getPathname());
-                $filename = uniqid('pdf_', true);
-                $pdfPath = $this->pdfService->generatePdfFromHtml($htmlContent, $filename);
-
-                $file = new File();
-                $file->setName($filename . '.pdf');
-                $file->setCreatedAt(new DateTimeImmutable());
-                $file->setUser($user); // Associer à l'utilisateur
-                $this->entityManager->persist($file);
-                $this->entityManager->flush();
-
-                return new Response(
-                    file_get_contents($pdfPath),
-                    200,
-                    [
-                        'Content-Type' => 'application/pdf',
-                        'Content-Disposition' => 'inline; filename="' . $filename . '.pdf"'
-                    ]
-                );
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Erreur lors de la génération du PDF: ' . $e->getMessage());
+    }
+    private function processPdfGeneration(array $data): Response
+    {
+        try {
+            $htmlContent = $this->extractHtmlContent($data);
+            if (!$htmlContent) {
+                $this->addFlash('error', 'Veuillez fournir un fichier HTML ou saisir du code HTML.');
+                return $this->redirectToRoute('generate_pdf');
             }
+            return $this->generateAndSavePdf($htmlContent);
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de la génération du PDF: ' . $e->getMessage());
+            return $this->redirectToRoute('generate_pdf');
         }
+    }
+    private function extractHtmlContent(array $data): ?string
+    {
+        if ($data['htmlFile']) {
+            /** @var UploadedFile $htmlFile */
+            $htmlFile = $data['htmlFile'];
+            return file_get_contents($htmlFile->getPathname());
+        }
+        if (!empty($data['htmlCode'])) {
+            return $data['htmlCode'];
+        }
+        return null;
+    }
+    private function generateAndSavePdf(string $htmlContent): Response
+    {
+        $filename = uniqid('pdf_', true);
+        $pdfPath = $this->pdfService->generatePdfFromHtml($htmlContent, $filename);
 
-        return $this->render('html/generate_pdf.html.twig', [
-            'form' => $form->createView(),
-            'warningMessage' => $warningMessage,
-        ]);
+        $file = new File();
+        $file->setName($filename . '.pdf');
+        $file->setCreatedAt(new DateTimeImmutable());
+        $file->setUser($this->getUser());
+        $this->entityManager->persist($file);
+        $this->entityManager->flush();
+
+        return new Response(
+            file_get_contents($pdfPath),
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $filename . '.pdf"'
+            ]
+        );
     }
 }

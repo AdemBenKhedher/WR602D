@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon compte{% endblock %}
+
+{% block body %}
+    <div class="account-container">
+        <div class="account-header">
+            <h1>Mon compte</h1>
+        </div>
+        
+        <div class="account-info">
+            <p><span class="info-label">Nom :</span> <span class="info-value">{{ user.lastname }}</span></p>
+            <p><span class="info-label">Prénom :</span> <span class="info-value">{{ user.firstname }}</span></p>
+            <p><span class="info-label">Rôle :</span> <span class="info-value">{{ user.roles[0] }}</span></p>
+            <p><span class="info-label">Email :</span> <span class="info-value">{{ user.email }}</span></p>
+        </div>
+        
+        <div class="account-actions">
+            <a href="{{ path('app_logout') }}" class="btn-logout">Se déconnecter</a>
+        </div>
+    </div>
+{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .account-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .account-header {
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+        }
+        
+        .account-info {
+            margin-bottom: 2rem;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .info-value {
+            color: #212529;
+        }
+        
+        .account-actions {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .btn-logout {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #dc3545;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-logout:hover {
+            background-color: #c82333;
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+{% endblock %}

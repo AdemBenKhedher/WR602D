@@ -1,41 +1,172 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Connexion!{% endblock %}
 
 {% block body %}
-    <form method="post">
+<div class="login-container">
+    <div class="login-form-wrapper">
+        <h1 class="login-title">Veuillez vous connecter</h1>
+        
         {% if error %}
             <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
         {% endif %}
 
         {% if app.user %}
-            <div class="mb-3">
-                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+            <div class="user-status">
+                Vous êtes connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Déconnexion</a>
             </div>
         {% endif %}
 
-        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-        <label for="username">Email</label>
-        <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
-        <label for="password">Password</label>
-        <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
-
-        <input type="hidden" name="_csrf_token"
-               value="{{ csrf_token('authenticate') }}"
-        >
-
-        {#
-            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-            See https://symfony.com/doc/current/security/remember_me.html
-
-            <div class="checkbox mb-3">
-                <input type="checkbox" name="_remember_me" id="_remember_me">
-                <label for="_remember_me">Remember me</label>
+        <form method="post" class="login-form">
+            <div class="form-group">
+                <label for="username">Email</label>
+                <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
             </div>
-        #}
+            
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+            </div>
 
-        <button class="btn btn-lg btn-primary" type="submit">
-            Sign in
-        </button>
-    </form>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            
+            <div class="form-actions">
+                <button class="btn btn-primary login-button" type="submit">
+                    Se connecter
+                </button>
+            </div>
+        </form>
+        
+        <div class="additional-links">
+            <a href="" class="forgot-password">Mot de passe oublié ?</a>
+            <a href="{{ path('app_register') }}" class="create-account">Créer un compte</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 20px;
+    }
+    
+    .login-form-wrapper {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 30px;
+        width: 100%;
+        max-width: 400px;
+    }
+    
+    .login-title {
+        color: #333;
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+    
+    .login-form .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .login-form label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 500;
+        color: #555;
+    }
+    
+    .login-form .form-control {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+        transition: border-color 0.2s;
+    }
+    
+    .login-form .form-control:focus {
+        border-color: #4a90e2;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+    
+    .form-actions {
+        margin-top: 30px;
+    }
+    
+    .login-button {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background-color: #4a90e2;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .login-button:hover {
+        background-color: #3a80d2;
+    }
+    
+    .alert {
+        padding: 12px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+    }
+    
+    .alert-danger {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+    
+    .user-status {
+        background-color: #e8f4f8;
+        padding: 12px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        font-size: 14px;
+        color: #555;
+    }
+    
+    .user-status a {
+        color: #4a90e2;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .user-status a:hover {
+        text-decoration: underline;
+    }
+    
+    .additional-links {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        font-size: 14px;
+    }
+    
+    .additional-links a {
+        color: #4a90e2;
+        text-decoration: none;
+    }
+    
+    .additional-links a:hover {
+        text-decoration: underline;
+    }
+</style>
 {% endblock %}

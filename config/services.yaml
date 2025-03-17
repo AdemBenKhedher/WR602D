@@ -12,6 +12,9 @@ services:
     App\Service\PdfGeneratorService:
         arguments:
             $gotenbergUrl: '%env(string:GOTENBERG_URL)%'
+    App\Twig\AppExtension:
+        arguments: ['@security.helper', '@App\Repository\UserSubscriptionRepository']
+        tags: ['twig.extension']
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
