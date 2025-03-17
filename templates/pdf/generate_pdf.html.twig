@@ -3,11 +3,258 @@
 {% block title %}Générer un PDF{% endblock %}
 
 {% block body %}
-    <h1>Générer un PDF à partir d'une URL</h1>
+    <div class="pdf-generator-container">
+        <h1>Générer un PDF à partir d'une URL</h1>
 
-    {{ form_start(form) }}
-        {{ form_row(form.url) }}
-        <button type="submit">Générer le PDF</button>
-    {{ form_end(form) }}
-
+        {{ form_start(form, {'attr': {'id': 'pdf-form'}}) }}
+            {{ form_row(form.url, {'attr': {'class': 'url-input', 'placeholder': 'Entrez l\'URL d\'une page web'}}) }}
+            <button type="submit">Générer le PDF</button>
+        {{ form_end(form) }}
+        
+        <div class="info-box">
+            <p>Note: Seuls les contenus HTML générés sont enregistrés dans la base de données. Les URLs et autres données sensibles ne sont pas stockées.</p>
+        </div>
+        
+        <div class="history-container">
+            <h2 class="history-title">Historique Temporaire des générations URL</h2>
+            <ul id="history-list" class="history-list">
+                <!-- L'historique sera affiché ici -->
+            </ul>
+            <button id="clear-history" class="clear-history">Effacer l'historique</button>
+        </div>
+    </div>
+{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .pdf-generator-container {
+            max-width: 800px;
+            margin: 2.5rem auto;
+            padding: 2.5rem;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        h1 {
+            color: #1e3a8a;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.7rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 1.1rem;
+        }
+        
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background-color: #f9fafb;
+            margin-bottom: 10px;
+        }
+        
+        input[type="text"]:focus, input[type="url"]:focus {
+            border-color: #4f46e5;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
+            background-color: #ffffff;
+            margin-bottom: 10px;
+        }
+        
+        button[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.25);
+        }
+        
+        button[type="submit"]:hover {
+            background-color: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(79, 70, 229, 0.3);
+        }
+        
+        button[type="submit"]:active {
+            transform: translateY(0);
+        }
+        
+        .info-box {
+            margin-top: 2rem;
+            padding: 1.2rem;
+            background-color: #eef2ff;
+            border-left: 5px solid #4f46e5;
+            border-radius: 8px;
+            color: #4b5563;
+            font-size: 0.95rem;
+        }
+        
+        .history-container {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #e5e7eb;
+        }
+        
+        .history-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            color: #1e3a8a;
+        }
+        
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background-color: #f9fafb;
+        }
+        
+        .history-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s ease;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-item:hover {
+            background-color: #eef2ff;
+        }
+        
+        .clear-history {
+            margin-top: 1rem;
+            padding: 0.7rem 1.2rem;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(239, 68, 68, 0.25);
+        }
+        
+        .clear-history:hover {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(239, 68, 68, 0.3);
+        }
+        
+        .clear-history:active {
+            transform: translateY(0);
+        }
+    </style>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('pdf-form');
+            const historyList = document.getElementById('history-list');
+            const clearHistoryBtn = document.getElementById('clear-history');
+            
+            // Charger l'historique depuis le localStorage
+            loadHistory();
+            
+            // Gérer la soumission du formulaire
+            form.addEventListener('submit', function(e) {
+                const urlInput = document.querySelector('.url-input');
+                const url = urlInput.value;
+                
+                if (url) {
+                    // Parse l'URL pour extraire seulement le nom de domaine et le chemin
+                    try {
+                        const parsedUrl = new URL(url);
+                        const domain = parsedUrl.hostname;
+                        const pathname = parsedUrl.pathname;
+                        
+                        // Enregistrer seulement les informations non sensibles dans l'historique
+                        const historyItem = {
+                            domain: domain,
+                            path: pathname,
+                            timestamp: new Date().toLocaleString(),
+                            type: 'HTML' // On présume que toutes les générations sont HTML
+                        };
+                        
+                        // Ajouter à l'historique
+                        addToHistory(historyItem);
+                    } catch(err) {
+                        console.error('URL invalide');
+                    }
+                }
+                
+                // Le formulaire continue sa soumission normalement
+            });
+            
+            // Gestion de l'effacement de l'historique
+            clearHistoryBtn.addEventListener('click', function() {
+                localStorage.removeItem('pdfGenerationHistory');
+                historyList.innerHTML = '';
+                loadHistory(); // Pour afficher le message "Aucun historique disponible"
+            });
+            
+            // Charger l'historique depuis localStorage
+            function loadHistory() {
+                const history = JSON.parse(localStorage.getItem('pdfGenerationHistory')) || [];
+                
+                historyList.innerHTML = '';
+                
+                if (history.length === 0) {
+                    const emptyItem = document.createElement('li');
+                    emptyItem.className = 'history-item';
+                    emptyItem.textContent = 'Aucun historique disponible';
+                    historyList.appendChild(emptyItem);
+                    return;
+                }
+                
+                history.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'history-item';
+                    listItem.textContent = `${item.domain}${item.path} - Type: ${item.type} - Généré le: ${item.timestamp}`;
+                    historyList.appendChild(listItem);
+                });
+            }
+            
+            // Ajouter un élément à l'historique
+            function addToHistory(item) {
+                const history = JSON.parse(localStorage.getItem('pdfGenerationHistory')) || [];
+                history.unshift(item); // Ajouter au début de l'historique
+                
+                // Limiter l'historique à 10 éléments
+                const limitedHistory = history.slice(0, 10);
+                
+                localStorage.setItem('pdfGenerationHistory', JSON.stringify(limitedHistory));
+                
+                loadHistory(); // Rafraîchir l'affichage
+            }
+        });
+    </script>
 {% endblock %}

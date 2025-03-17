@@ -1,2 +1,305 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Home{% endblock %}
+
+{% block body %}
+    <div class="hero-section">
+        <div class="container">
+            <h1>Bienvenue sur notre plateforme mmIpdf</h1>
+            <p>Découvrez toutes nos fonctionnalités et services exceptionnels</p>
+            {% if app.user %}
+                <a href="{{ path('generate_pdf') }}" class="btn-primary">Commencer maintenant</a>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="btn-primary">Commencer maintenant</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container">        
+        <h2 class="section-title">Nos Abonnements</h2>
+        <div class="subscription-section">
+            <div class="subscriptions">
+                {% for subscription in subscriptions %}
+                    <div class="subscription {% if subscription.name == 'Basique' %}basic-plan{% elseif subscription.name == 'Premium' %}premium-plan{% elseif subscription.name == 'Pro' %}pro-plan{% else %}enterprise-plan{% endif %}">
+                        {% if user_subscription and user_subscription.id == subscription.id %}
+                            <div class="current-badge">Abonnement actuel</div>
+                        {% endif %}
+                        
+                        <h3>{{ subscription.name }}</h3>
+                        
+                        <div class="subscription-description">
+                            {% if subscription.description %}
+                                <p>{{ subscription.description }}</p>
+                            {% else %}
+                                {% if subscription.name == 'Basique' %}
+                                    <p>L'essentiel pour débuter</p>
+                                {% elseif subscription.name == 'Premium' %}
+                                    <p>Pour les utilisateurs réguliers</p>
+                                {% elseif subscription.name == 'Pro' %}
+                                    <p>Solutions avancées pour professionnels</p>
+                                {% else %}
+                                    <p>Solutions complètes pour entreprises</p>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        
+                        <ul class="feature-list">
+                            <li>{{ subscription.maxPdf }} documents / jour</li>
+                        </ul>
+
+                        {% if subscription.specialPrice and subscription.specialPriceTo is not null and subscription.specialPriceTo > "now"|date %}
+                            <div class="special-offer">
+                                <p>Offre spéciale jusqu'au {{ subscription.specialPriceTo|date('d/m/Y') }}</p>
+                            </div>
+                            <div class="price">
+                                <span><span class="old-price">{{ subscription.price }}€</span><span class="special-price">{{ subscription.specialPrice }}€</span></span>
+                                <span class="price-period">par mois</span>
+                            </div>
+                        {% else %}
+                            <div class="price">
+                                <span>{{ subscription.price }}€</span>
+                                <span class="price-period">par mois</span>
+                            </div>
+                        {% endif %}
+
+                        {% if user_subscription and user_subscription.id == subscription.id %}
+                            <span class="subscription-btn" style="background-color: var(--secondary-color)">Abonnement actif</span>
+                        {% else %}
+                            {% if subscription.name == 'Basique' %}
+                                {% if user_subscription is null %}
+                                    <span class="subscription-btn" style="background-color: var(--gray-color)">Abonnement gratuit</span>
+                                {% else %}
+                                    <a class="subscription-btn" href="{{ path('change_subscription', {'subscriptionId': 'basic'}) }}">Revenir à l'offre gratuite</a>
+                                {% endif %}
+                            {% else %}
+                                <a class="subscription-btn" href="{{ path('change_subscription', {'subscriptionId': subscription.id}) }}">Choisir cette offre</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+                    <h2 class="section-title">Nos services</h2>
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <h3>Performance</h3>
+                <p>Notre plateforme est optimisée pour offrir des performances exceptionnelles et une expérience fluide.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Sécurité</h3>
+                <p>La sécurité de vos données est notre priorité absolue avec un chiffrement de bout en bout.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Communauté</h3>
+                <p>Rejoignez notre communauté et partagez vos expériences avec d'autres utilisateurs passionnés.</p>
+            </div>
+        </div>
+        </div>
+        
+        <div class="cta-section" style="text-align: center; margin: 4rem 0;">
+            <h2>Prêt à commencer l'aventure ?</h2>
+            <p>Découvrez toutes nos fonctionnalités.</p>
+            {% if app.user %}
+            <a href="{{ path('generate_pdf') }}" class="btn-primary">Générer un PDF</a>
+            <a href="{{ path('app_account') }}" class="btn-primary" style="margin-left: 1rem; background: white; color: #6a11cb; border: 2px solid #6a11cb;">Mon profil</a>
+            {% else %}
+            <a href="{{ path('app_login') }}" class="btn-primary">Se connecter</a>
+            <a href="{{ path('app_register') }}" class="btn-primary" style="margin-left: 1rem; background: white; color: #6a11cb; border: 2px solid #6a11cb;">S'inscrire</a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #6a11cb;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+        
+        .section-title:after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            margin: 0.5rem auto;
+        }
+        
+        /* Styles pour la section abonnements */
+        .subscription-section {
+            margin: 3rem 0;
+        }
+        
+        .subscriptions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .subscription {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .subscription:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .premium-plan {
+            border: 2px solid #6a11cb;
+        }
+        
+        .current-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #6a11cb;
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            border-bottom-left-radius: 10px;
+        }
+        
+        .price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin: 1rem 0;
+        }
+        
+        .price-period {
+            color: #777;
+            font-size: 1rem;
+        }
+        
+        .feature-list {
+            margin: 1.5rem 0;
+            text-align: left;
+            padding-left: 1rem;
+        }
+        
+        .feature-list li {
+            margin-bottom: 0.5rem;
+            list-style-type: none;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            color: #6a11cb;
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .subscription-btn {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        
+        .old-price {
+            text-decoration: line-through;
+            color: #999;
+            margin-right: 0.5rem;
+        }
+        
+        .special-price {
+            color: #ff4757;
+        }
+        
+        .special-offer {
+            color: #ff4757;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+{% endblock %}
+
