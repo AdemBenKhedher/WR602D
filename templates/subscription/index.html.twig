@@ -3,50 +3,339 @@
 {% block title %}Gestion des abonnements{% endblock %}
 
 {% block body %}
-    <h1>Choisir votre abonnement</h1>
+    <div class="subscription-container">
+        <h1 class="page-heading">Nos formules d'abonnement</h1>
 
-    {% if app.user %}
-        <p>Bienvenue, {{ app.user.firstname }}. Vous pouvez changer d'abonnement.</p>
-    {% else %}
-        <p>Vous devez être connecté pour changer d'abonnement.</p>
-    {% endif %}
-
-    <div class="subscriptions">
-        {% if user_subscription %}
-            <p>Abonnement actuel : {{ user_subscription.name }}</p>
+        {% if app.user %}
+            <div class="user-welcome">
+                <p>Bonjour <strong>{{ app.user.firstname }}</strong>, choisissez l'offre adaptée à vos besoins.</p>
+            </div>
         {% else %}
-            <p>Abonnement actuel : Aucune offre choisie (Basique)</p>
+            <div class="user-welcome">
+                <p>Pour accéder à nos offres, veuillez vous <a href="{{ path('app_login') }}">connecter</a> ou <a href="{{ path('app_register') }}">créer un compte</a>.</p>
+            </div>
         {% endif %}
 
-        {% for subscription in subscriptions %}
-            <div class="subscription">
-                <h3>{{ subscription.name }}</h3>
-                <p>{{ subscription.description }}</p>
-                <p>Documents maximum : {{ subscription.maxPdf }}</p>
-
-                {% if subscription.specialPrice %}
-                    <p>Prix: <span style="text-decoration: line-through;">{{ subscription.price }}€</span> 
-                        <span style="color: red;">{{ subscription.specialPrice }}€</span>
-                    </p>
-                    <p>Offre spéciale : Valide du {{ subscription.specialPriceFrom|date('d/m/Y') }} au {{ subscription.specialPriceTo|date('d/m/Y') }}</p>
-                {% else %}
-                    <p>Prix: {{ subscription.price }}€</p>
-                {% endif %}
-
-                {% if user_subscription and user_subscription.id == subscription.id %}
-                    <span>Abonné à cet abonnement</span>
-                {% else %}
-                    {% if subscription.name == 'Basique' %}
-                        {% if user_subscription is null %}
-                            <span>Abonné gratuitement</span>
-                        {% else %}
-                            <a href="{{ path('change_subscription', {'subscriptionId': 'basic'}) }}">Réinitialiser l'abonnement vers l'offre Basique</a>
-                        {% endif %}
-                    {% else %}
-                        <a href="{{ path('change_subscription', {'subscriptionId': subscription.id}) }}">Changer d'abonnement</a>
-                    {% endif %}
-                {% endif %}
+        {% if user_subscription %}
+            <div class="current-plan" {% if count >= user_subscription.maxPdf %}style="background: linear-gradient(135deg, rgba(244, 63, 94, 0.1), rgba(251, 113, 133, 0.1)); border-left: 4px solid var(--accent-color2);"{% endif %}>
+            <p>Votre abonnement actuel : <strong>{{ user_subscription.name }}</strong>{% if count >= user_subscription.maxPdf %} <span style="color: var(--accent-color2);">(Limite atteinte: {{ count }}/{{ user_subscription.maxPdf }})</span>{% endif %}</p>
+            {% if count >= user_subscription.maxPdf %}<p style="color: var(--accent-color2); font-weight: 600; margin-top: 0.5rem;">Vous avez atteint votre limite quotidienne. Passez à un abonnement supérieur pour continuer à utiliser nos services sans interruption.</p>{% endif %}
             </div>
-        {% endfor %}
+        {% else %}
+            <div class="current-plan">
+                <p>Votre abonnement actuel : <strong>Basique (gratuit)</strong></p>
+            </div>
+        {% endif %}
+
+        <div class="subscriptions">
+            {% for subscription in subscriptions %}
+                <div class="subscription {% if subscription.name == 'Basique' %}basic-plan{% elseif subscription.name == 'Premium' %}premium-plan{% elseif subscription.name == 'Pro' %}pro-plan{% else %}enterprise-plan{% endif %}">
+                    {% if user_subscription and user_subscription.id == subscription.id %}
+                        <div class="current-badge">Abonnement actuel</div>
+                    {% endif %}
+                    
+                    <h3>{{ subscription.name }}</h3>
+                    
+                    <div class="subscription-description">
+                        {% if subscription.description %}
+                            <p>{{ subscription.description }}</p>
+                        {% else %}
+                            {% if subscription.name == 'Basique' %}
+                                <p>L'essentiel pour débuter</p>
+                            {% elseif subscription.name == 'Premium' %}
+                                <p>Pour les utilisateurs réguliers</p>
+                            {% elseif subscription.name == 'Pro' %}
+                                <p>Solutions avancées pour professionnels</p>
+                            {% else %}
+                                <p>Solutions complètes pour entreprises</p>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    
+                    <ul class="feature-list">
+                        <li>{{ subscription.maxPdf }} documents / jour</li>
+
+
+                    </ul>
+
+                    {% if subscription.specialPrice and subscription.specialPriceTo is not null and subscription.specialPriceTo > "now"|date %}
+                        <div class="special-offer">
+                            <p>Offre spéciale jusqu'au {{ subscription.specialPriceTo|date('d/m/Y') }}</p>
+                        </div>
+                        <div class="price">
+                            <span><span class="old-price">{{ subscription.price }}€</span><span class="special-price">{{ subscription.specialPrice }}€</span></span>
+                            <span class="price-period">par mois</span>
+                        </div>
+                    {% else %}
+                        <div class="price">
+                            <span>{{ subscription.price }}€</span>
+                            <span class="price-period">par mois</span>
+                        </div>
+                    {% endif %}
+
+                    {% if user_subscription and user_subscription.id == subscription.id %}
+                        <span class="subscription-btn" style="background-color: var(--secondary-color2)">Abonnement actif</span>
+                    {% else %}
+                        {% if subscription.name == 'Basique' %}
+                            {% if user_subscription is null %}
+                                <span class="subscription-btn" style="background-color: var(--gray-color2)">Abonnement gratuit</span>
+                            {% else %}
+                                <a class="subscription-btn" href="{{ path('change_subscription', {'subscriptionId': 'basic'}) }}">Revenir à l'offre gratuite</a>
+                            {% endif %}
+                        {% else %}
+                            <a class="subscription-btn" href="{{ path('change_subscription', {'subscriptionId': subscription.id}) }}">Choisir cette offre</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animation d'entrée
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = entry.target.classList.contains('premium-plan') ? 
+                                'translateY(0) scale(1.05)' : 'translateY(0)';
+                        }, index * 150);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            const cards = document.querySelectorAll('.subscription');
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = card.classList.contains('premium-plan') ? 
+                    'translateY(30px) scale(1.05)' : 'translateY(30px)';
+                card.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                observer.observe(card);
+                
+                // Effet de surbrillance au hover
+                card.addEventListener('mouseenter', function() {
+                    cards.forEach(c => {
+                        if (c !== card) {
+                            c.style.opacity = '0.7';
+                            c.style.filter = 'blur(1px)';
+                        }
+                    });
+                    
+                    // Ajoute un effet de lueur
+                    card.style.boxshadow2 = card.classList.contains('premium-plan') ?
+                        '0 25px 50px -12px rgba(59, 130, 246, 0.5)' :
+                        '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    cards.forEach(c => {
+                        c.style.opacity = '1';
+                        c.style.filter = 'blur(0)';
+                    });
+                    
+                    // Restaure l'ombre normale
+                    card.style.boxshadow2 = card.classList.contains('premium-plan') ?
+                        'var(--highlight-shadow2)' : 'var(--shadow2)';
+                });
+            });
+        });
+    </script>
 {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary-color2:rgb(0, 56, 146);
+            --primary-dark2: #1d4ed8;
+            --secondary-color2: #10b981;
+            --dark-color2: #1e293b;
+            --light-color2: #f8fafc;
+            --accent-color2: #f43f5e;
+            --gray-color22: #94a3b8;
+            --shadow2: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --highlight-shadow2: 0 25px 50px -12px rgba(59, 130, 246, 0.25);
+        }
+        
+        .subscription-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+            background-color: #f9fafb;
+            border-radius: 20px;
+        }
+        
+        .page-heading {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            color: var(--dark-color2);
+            font-size: 2.5rem;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+        
+        .page-heading::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border-radius: 2px;
+        }
+        
+        .user-welcome {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow2: var(--shadow2);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .current-plan {
+            text-align: center;
+            font-weight: 600;
+            padding: 1.2rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, rgba(78, 59, 246, 0.1), rgba(16, 75, 185, 0.1));
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color2);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow2: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        
+        .subscriptions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .subscription {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow2: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow2 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .subscription:hover {
+            transform: translateY(-10px);
+            box-shadow2: 0 15px 30px rgba(0, 0, 0, 0.15);
+            border: 2px solid #6a11cb;
+        }
+        
+        .premium-plan {
+            /* Add any specific styles for premium-plan if needed */
+        }
+        
+        .current-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #6a11cb;
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            border-bottom-left-radius: 10px;
+        }
+        
+        .price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin: 1rem 0;
+        }
+        
+        .price-period {
+            color: #777;
+            font-size: 1rem;
+        }
+        
+        .feature-list {
+            margin: 1.5rem 0;
+            text-align: left;
+            padding-left: 1rem;
+        }
+        
+        .feature-list li {
+            margin-bottom: 0.5rem;
+            list-style-type: none;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            color: #6a11cb;
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .subscription-btn {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow2 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        
+        .subscription-btn:hover {
+            transform: scale(1.05);
+            box-shadow2: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+        
+        .old-price {
+            text-decoration: line-through;
+            color: #999;
+            margin-right: 0.5rem;
+        }
+        
+        .special-price {
+            color: #ff4757;
+        }
+        
+        .special-offer {
+            color: #ff4757;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .subscriptions {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+            
+            .subscription {
+                margin-bottom: 1.5rem;
+                min-height: auto;
+            }
+            
+            .premium-plan {
+                transform: scale(1);
+            }
+        }
+    </style>
+{% endblock %}
+
+

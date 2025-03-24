@@ -30,6 +30,10 @@ class RegistrationController extends AbstractController
         Security $security,
         EntityManagerInterface $entityManager
     ): Response {
+        $user = $this->getUser();
+        if ($user) {
+            return $this->redirectToRoute('app_Home');
+        }
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
@@ -73,11 +77,11 @@ class RegistrationController extends AbstractController
         } catch (VerifyEmailExceptionInterface $exception) {
             $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
 
-            return $this->redirectToRoute('app_register');
+            return $this->redirectToRoute('app_Home');
         }
 
         $this->addFlash('success', 'Your email address has been verified.');
 
-        return $this->redirectToRoute('app_register');
+        return $this->redirectToRoute('app_Home');
     }
 }

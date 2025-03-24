@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Email de réinitialisation de mot de passe envoyé{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .reset-password-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .reset-password-container h1 {
+            color: #343a40;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+        
+        .reset-password-info {
+            background: linear-gradient(135deg,rgba(107, 17, 203, 0.42) 0%,rgba(37, 116, 252, 0.36) 100%);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .reset-password-actions {
+            margin-top: 25px;
+            text-align: center;
+        }
+        
+        .reset-password-actions a {
+            color:rgb(3, 0, 209);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .reset-password-actions a:hover {
+            text-decoration: underline;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="reset-password-container">
+        <h1>Email de réinitialisation envoyé</h1>
+        
+        <div class="reset-password-info">
+            <p>
+                Si un compte correspond à votre email, un message vient d'être envoyé contenant un lien que vous pouvez utiliser pour réinitialiser votre mot de passe.
+            </p>
+            <p>
+                Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
+            </p>
+        </div>
+        
+        <div class="reset-password-actions">
+            <p>Si vous ne recevez pas d'email, veuillez vérifier votre dossier spam ou <a href="{{ path('app_forgot_password_request') }}">essayer à nouveau</a>.</p>
+        </div>
+    </div>
+{% endblock %}
