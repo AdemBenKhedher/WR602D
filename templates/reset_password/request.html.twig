@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réinitialiser votre mot de passe{% endblock %}
+
+{% block body %}
+    <div class="reset-password-container">
+        {% for flash_error in app.flashes('reset_password_error') %}
+            <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+        {% endfor %}
+        <h1 class="reset-password-title">Réinitialiser votre mot de passe</h1>
+
+        {{ form_start(requestForm) }}
+            {{ form_row(requestForm.email, {'label_attr': {'class': 'form-label'}, 'attr': {'class': 'form-control'}}) }}
+            <div class="form-info">
+                <small>
+                    Entrez votre adresse e-mail et nous vous enverrons un
+                    lien pour réinitialiser votre mot de passe.
+                </small>
+            </div>
+
+            <button class="btn-reset-password">Envoyer l'e-mail de réinitialisation</button>
+        {{ form_end(requestForm) }}
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .reset-password-container {
+        max-width: 500px;
+        margin: 60px auto;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+    
+    .reset-password-title {
+        color:rgb(65, 65, 65);
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #495057;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 16px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    
+    .form-control:focus {
+        border-color: #3b5998;
+        box-shadow: 0 0 0 3px rgba(59, 89, 152, 0.25);
+        outline: none;
+    }
+    
+    .form-info {
+        background-color: #f8f9fa;
+        padding: 12px;
+        border-radius: 6px;
+        margin: 15px 0;
+        color: #6c757d;
+    }
+    
+    .btn-reset-password {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        width: 100%;
+        font-weight: 600;
+        margin-top: 20px;
+        transition: background-color 0.3s;
+    }
+    
+    .btn-reset-password:hover {
+        background-color: #2d4373;
+        cursor: pointer;
+    }
+    
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        border: 1px solid #f5c6cb;
+    }
+</style>
+{% endblock %}
