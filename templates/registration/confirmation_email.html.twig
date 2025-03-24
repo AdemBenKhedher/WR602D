@@ -1,11 +1,75 @@
-<h1>Hi! Please confirm your email!</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: 'Helvetica', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .email-container {
+            border: 1px solid #e7e7e7;
+            border-radius: 8px;
+            padding: 30px;
+            background-color: #fff;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        p {
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 4px 10px rgba(106, 17, 203, 0.3);
+            transition: transform 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #777;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <h1>Confirmation de votre adresse email</h1>
 
-<p>
-    Please confirm your email address by clicking the following link: <br><br>
-    <a href="{{ signedUrl|raw }}">Confirm my Email</a>.
-    This link will expire in {{ expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle') }}.
-</p>
+        <p>
+            Merci de vous être inscrit. Pour valider votre compte, veuillez confirmer votre adresse email en cliquant sur le bouton ci-dessous :
+        </p>
 
-<p>
-    Cheers!
-</p>
+        <div style="text-align: center;">
+            <a href="{{ signedUrl|raw }}" class="btn">Confirmer mon email</a>
+        </div>
+
+        <p style="font-size: 13px; color: #777;">
+            Ce lien expirera dans {{ expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle') }}.
+        </p>
+
+        <div class="footer">
+            Cordialement,<br>
+            L'équipe WR602D
+        </div>
+    </div>
+</body>
+</html>
