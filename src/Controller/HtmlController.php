@@ -51,6 +51,7 @@ class HtmlController extends AbstractController
             'form' => $form->createView()
         ]);
     }
+
     private function checkSubscription(): bool
     {
         $user = $this->getUser();
@@ -76,6 +77,7 @@ class HtmlController extends AbstractController
         }
         return true;
     }
+
     private function createPdfForm()
     {
         return $this->createFormBuilder()
@@ -94,9 +96,10 @@ class HtmlController extends AbstractController
                 'required' => false,
                 'attr' => ['rows' => 10, 'placeholder' => 'Collez votre code HTML ici...']
             ])
-            ->add('submit', SubmitType::class, ['label' => 'Générer PDF'])
+            ->add('submit', SubmitType::class, ['label' => 'Générer et Envoyer PDF'])
             ->getForm();
     }
+
     private function processPdfGeneration(array $data): Response
     {
         try {
@@ -105,12 +108,14 @@ class HtmlController extends AbstractController
                 $this->addFlash('error', 'Veuillez fournir un fichier HTML ou saisir du code HTML.');
                 return $this->redirectToRoute('generate_pdf');
             }
+
             return $this->generateAndSavePdf($htmlContent);
         } catch (\Exception $e) {
             $this->addFlash('error', 'Erreur lors de la génération du PDF: ' . $e->getMessage());
             return $this->redirectToRoute('generate_pdf');
         }
     }
+
     private function extractHtmlContent(array $data): ?string
     {
         if ($data['htmlFile']) {
@@ -123,6 +128,7 @@ class HtmlController extends AbstractController
         }
         return null;
     }
+
     private function generateAndSavePdf(string $htmlContent): Response
     {
         $filename = uniqid('pdf_', true);
@@ -135,13 +141,20 @@ class HtmlController extends AbstractController
         $this->entityManager->persist($file);
         $this->entityManager->flush();
 
-        return new Response(
-            file_get_contents($pdfPath),
-            200,
-            [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="' . $filename . '.pdf"'
-            ]
+        $recipientEmail = $this->getUser()->getEmail();
+        $this->pdfService->sendPdfByEmail(
+            $pdfPath,
+            $recipientEmail,
+            'Votre PDF généré',
+            'Voici le PDF que vous avez demandé.'
         );
+
+        $this->addFlash('success', 'Le PDF a été généré et envoyé à votre adresse e-mail.
+         Vous pouvez également le télécharger en cliquant sur le bouton ci-dessous.');
+
+        return $this->render('html/pdf_success.html.twig', [
+            'pdfPath' => $pdfPath,
+            'filename' => $filename . '.pdf',
+        ]);
     }
 }
