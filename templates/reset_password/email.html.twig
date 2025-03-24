@@ -1,9 +1,29 @@
-<h1>Bonjour!</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Réinitialisation de mot de passe</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+    <div style="background-color: #ffffff; border-radius: 5px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <h1 style="color: #2c3e50; font-size: 24px; margin-bottom: 20px; border-bottom: 2px solid #eaeaea; padding-bottom: 10px;">Bonjour!</h1>
 
-<p>Pour réinitialiser votre mot de passe, veuillez cliquer sur le lien suivant</p>
+        <p style="margin-bottom: 20px; font-size: 16px;">Pour réinitialiser votre mot de passe, veuillez cliquer sur le lien suivant :</p>
 
-<a href="{{ url('app_reset_password', {token: resetToken.token}) }}">{{ url('app_reset_password', {token: resetToken.token}) }}</a>
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ url('app_reset_password', {token: resetToken.token}) }}" style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">Réinitialiser mon mot de passe</a>
+        </div>
+        
+        <p style="margin-bottom: 10px; font-size: 14px; color: #666;">Si le bouton ne fonctionne pas, vous pouvez copier et coller le lien suivant dans votre navigateur :</p>
+        <p style="margin-bottom: 25px; font-size: 14px; word-break: break-all; background-color: #f5f5f5; padding: 10px; border-radius: 4px;">{{ url('app_reset_password', {token: resetToken.token}) }}</p>
 
-<p>Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
+        <p style="margin-bottom: 20px; font-size: 14px; color: #e74c3c;">Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
 
-<p>Cordialement!</p>
+        <p style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eaeaea; font-size: 16px;">Cordialement!</p>
+    </div>
+    
+    <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #999;">
+        <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+    </div>
+</body>
+</html>
