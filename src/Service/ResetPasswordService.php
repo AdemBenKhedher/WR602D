@@ -57,13 +57,12 @@ class ResetPasswordService
 
     public function generateFakeResetToken(): ResetPasswordToken
     {
-        // Convert the returned ResetPasswordToken from the helper to the correct type
         $fakeToken = $this->resetPasswordHelper->generateFakeResetToken();
 
         return new ResetPasswordToken(
             $fakeToken->getToken(),
             $fakeToken->getExpiresAt(),
-            time() // Pass the current timestamp as an integer
+            time()
         );
     }
 

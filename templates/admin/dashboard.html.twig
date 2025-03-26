@@ -1,0 +1,116 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}Tableau de bord{% endblock %}
+
+{% block content %}
+    <div class="row mt-4 stats-container">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3 stats-card">
+                <div class="card-header">
+                    <i class="fas fa-users icon"></i> Utilisateurs
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title text-center">{{ stats.users }}</h2>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\UserCrudController') }}" class="text-white">
+                        <span>Voir tous les utilisateurs</span> <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3 stats-card">
+                <div class="card-header">
+                    <i class="fas fa-credit-card icon"></i> Abonnements
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title text-center">{{ stats.subscriptions }}</h2>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\SubscriptionCrudController') }}" class="text-white">
+                        <span>Voir tous les abonnements</span> <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3 stats-card">
+                <div class="card-header">
+                    <i class="fas fa-file-pdf icon"></i> PDFs générés
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title text-center">{{ stats.files }}</h2>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\FileCrudController') }}" class="text-white">
+                        <span>Voir tous les fichiers</span> <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    <style>
+        .stats-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stats-card .card-header {
+            border-radius: 10px 10px 0 0;
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 15px;
+        }
+        
+        .stats-card .card-body {
+            padding: 25px 15px;
+        }
+        
+        .stats-card .card-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .stats-card .card-footer {
+            border-radius: 0 0 10px 10px;
+            padding: 12px 15px;
+            font-weight: 500;
+        }
+        
+        .stats-card .card-footer a {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+        }
+        
+        .stats-card .card-footer a:hover {
+            opacity: 0.9;
+        }
+        
+        .stats-card .icon {
+            font-size: 1.5rem;
+            margin-right: 8px;
+        }
+        
+        .stats-container {
+            padding: 10px 0;
+        }
+    </style>
+{% endblock %}
