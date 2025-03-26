@@ -1,0 +1,6 @@
+"Invalid credentials.": "Identifiants invalides. L'email ou le mot de passe est incorrect."
+"Invalid CSRF token.": "Jeton CSRF invalide. Veuillez réessayer."
+"Username could not be found.": "Cet email n'est pas enregistré dans notre système."
+"The presented password is invalid.": "Le mot de passe saisi est incorrect."
+"Your password should be at least 6 characters": "Votre mot de passe doit comporter au moins 6 caractères"
+"There is already an account with this email": "Un compte existe déjà avec cet email"

@@ -71,13 +71,13 @@ class HtmlToPdfService
 
     public function sendPdfByEmail(string $pdfPath, string $recipientEmail, string $subject, string $body): void
     {
-        $htmlBody = $this->twig->render('email/pdf_email.html.twig'); // Render the email body from the Twig template
+        $htmlBody = $this->twig->render('email/pdf_email.html.twig');
 
         $email = (new Email())
             ->from('no-reply@mmipdf.fr')
             ->to($recipientEmail)
             ->subject($subject)
-            ->html($htmlBody) // Use the rendered Twig template as the email body
+            ->html($htmlBody)
             ->attachFromPath($pdfPath, basename($pdfPath), 'application/pdf');
 
         $this->mailer->send($email);

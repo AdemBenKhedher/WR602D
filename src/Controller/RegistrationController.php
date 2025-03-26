@@ -19,8 +19,13 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 class RegistrationController extends AbstractController
 {
-    public function __construct(private EmailVerifier $emailVerifier)
-    {
+    private $entityManager;
+
+    public function __construct(
+        private EmailVerifier $emailVerifier,
+        EntityManagerInterface $entityManager
+    ) {
+        $this->entityManager = $entityManager;
     }
 
     #[Route('/register', name: 'app_register')]
@@ -43,9 +48,12 @@ class RegistrationController extends AbstractController
             $plainPassword = $form->get('plainPassword')->getData();
 
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
+            // Set isVerified to false by default
+            $user->setIsVerified(false);
 
             $entityManager->persist($user);
             $entityManager->flush();
+
             $this->emailVerifier->sendEmailConfirmation(
                 'app_verify_email',
                 $user,
@@ -56,8 +64,10 @@ class RegistrationController extends AbstractController
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
 
-
-            return $security->login($user, 'form_login', 'main');
+            // Don't automatically log in the user - redirect to a thank you page
+            $this->addFlash('success', 'Votre compte a été créé. 
+            Veuillez vérifier votre email pour confirmer votre inscription.');
+            return $this->redirectToRoute('app_registration_confirmation');
         }
 
         return $this->render('registration/register.html.twig', [
@@ -68,20 +78,31 @@ class RegistrationController extends AbstractController
     #[Route('/verify/email', name: 'app_verify_email')]
     public function verifyUserEmail(Request $request, TranslatorInterface $translator): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         try {
-            /** @var user $user */
-            $user = $this->getUser();
-            $this->emailVerifier->handleEmailConfirmation($request, $user);
+            $id = $request->query->get('id');
+            if ($id) {
+                $user = $this->entityManager->getRepository(User::class)->find($id);
+                if ($user) {
+                    $this->emailVerifier->handleEmailConfirmation($request, $user);
+
+                    $this->addFlash('success', 'Votre adresse email a été vérifiée avec succès!
+                     Vous pouvez maintenant vous connecter.');
+
+                    return $this->render('registration/confirmation_success.html.twig');
+                }
+            }
+
+            $this->addFlash('error', 'Le lien de vérification n\'est pas valide ou a expiré.');
+            return $this->redirectToRoute('app_login');
         } catch (VerifyEmailExceptionInterface $exception) {
             $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
-
-            return $this->redirectToRoute('app_Home');
+            return $this->redirectToRoute('app_register');
         }
+    }
 
-        $this->addFlash('success', 'Your email address has been verified.');
-
-        return $this->redirectToRoute('app_Home');
+    #[Route('/registration/confirmation', name: 'app_registration_confirmation')]
+    public function registrationConfirmation(): Response
+    {
+        return $this->render('registration/confirmation.html.twig');
     }
 }

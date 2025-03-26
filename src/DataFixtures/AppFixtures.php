@@ -46,7 +46,7 @@ class AppFixtures extends Fixture
             $today = new DateTimeImmutable();
             $specialPriceFrom = $today->modify('+1 day');
 
-            // Suppression du bloc else, et gestion des prix spéciaux
+
             if ($i === 0) {
                 $specialPriceTo = $specialPriceFrom->modify('+60 days');
             }

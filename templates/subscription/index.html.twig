@@ -93,7 +93,6 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Animation d'entrée
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach((entry, index) => {
                     if (entry.isIntersecting) {
@@ -114,7 +113,6 @@
                 card.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                 observer.observe(card);
                 
-                // Effet de surbrillance au hover
                 card.addEventListener('mouseenter', function() {
                     cards.forEach(c => {
                         if (c !== card) {
@@ -123,7 +121,6 @@
                         }
                     });
                     
-                    // Ajoute un effet de lueur
                     card.style.boxshadow2 = card.classList.contains('premium-plan') ?
                         '0 25px 50px -12px rgba(59, 130, 246, 0.5)' :
                         '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)';
@@ -135,7 +132,6 @@
                         c.style.filter = 'blur(0)';
                     });
                     
-                    // Restaure l'ombre normale
                     card.style.boxshadow2 = card.classList.contains('premium-plan') ?
                         'var(--highlight-shadow2)' : 'var(--shadow2)';
                 });

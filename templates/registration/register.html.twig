@@ -10,37 +10,71 @@
 
         <h1>Inscription</h1>
 
-        {{ form_errors(registrationForm) }}
-
         {{ form_start(registrationForm) }}
             <div class="form-group">
                 {{ form_label(registrationForm.email, 'Email') }}
                 {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                {% if registrationForm.email.vars.errors|length > 0 %}
+                    <div class="form-errors">
+                        {% for error in registrationForm.email.vars.errors %}
+                            {{ error.message }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
             
             <div class="form-group">
                 {{ form_label(registrationForm.plainPassword, 'Mot de passe') }}
                 {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                {% if registrationForm.plainPassword.vars.errors|length > 0 %}
+                    <div class="form-errors">
+                        {% for error in registrationForm.plainPassword.vars.errors %}
+                            {{ error.message }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
             
             <div class="form-group">
                 {{ form_label(registrationForm.firstname, 'Prénom') }}
                 {{ form_widget(registrationForm.firstname, {'attr': {'class': 'form-control'}}) }}
+                {% if registrationForm.firstname.vars.errors|length > 0 %}
+                    <div class="form-errors">
+                        {% for error in registrationForm.firstname.vars.errors %}
+                            {{ error.message }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
             
             <div class="form-group">
                 {{ form_label(registrationForm.lastname, 'Nom') }}
                 {{ form_widget(registrationForm.lastname, {'attr': {'class': 'form-control'}}) }}
+                {% if registrationForm.lastname.vars.errors|length > 0 %}
+                    <div class="form-errors">
+                        {% for error in registrationForm.lastname.vars.errors %}
+                            {{ error.message }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
             
             <div class="form-check">
                 {{ form_widget(registrationForm.agreeTerms) }}
                 {{ form_label(registrationForm.agreeTerms, "J'accepte les conditions d'utilisation") }}
+                {% if registrationForm.agreeTerms.vars.errors|length > 0 %}
+                    <div class="form-errors">
+                        {% for error in registrationForm.agreeTerms.vars.errors %}
+                            {{ error.message }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
 
             <button type="submit" class="btn-register">S'inscrire</button>
         {{ form_end(registrationForm) }}
-         <div class="additional-links">
+        
+        <div class="additional-links">
             <p>Vous avez un compte ?<a href="{{ path('app_login') }}"> Se connecter</a></p>
         </div>
     </div>
@@ -75,6 +109,24 @@
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 16px;
+        }
+        
+        .form-control:focus {
+            border-color: #6a11cb;
+            outline: none;
+            box-shadow: 0 0 5px rgba(106, 17, 203, 0.3);
+        }
+        
+        .form-errors {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            font-weight: 500;
+            background-color: #ffe6e6;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+            box-shadow: 0 2px 5px rgba(217, 83, 79, 0.2);
         }
         
         .btn-register {
@@ -117,14 +169,14 @@
         }
         
         .additional-links {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 20px;
-        font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 14px;
         }
         
         .additional-links a {
-            color: #4a90e2;
+            color: #6a11cb;
             text-decoration: none;
         }
         
