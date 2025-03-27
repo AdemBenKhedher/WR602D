@@ -69,4 +69,3 @@ jobs:
         run: xvfb-run --auto-servernum -- npm run cypress:run
         env:
           DISPLAY: ':99.0'
-          CYPRESS_CACHE_FOLDER: '/root/.cache/Cypress'
