@@ -64,14 +64,20 @@ jobs:
 
       - name: 📦 Install Node dependencies
         run: npm ci
-        
-      - name: 🛠 Create and set permissions for Cypress cache directory
-        run: |
-          mkdir -p $HOME/.cache/Cypress
-          chmod -R 777 $HOME/.cache/Cypress
 
-      - name: 🚀 Run Cypress Tests
-        run: xvfb-run --auto-servernum -- npm run cypress:run
+      - name: 🚀 Supprimer le cache Cypress s'il est corrompu
+        run: rm -rf ~/.cache/Cypress
+
+      - name: 🛠 Installer Cypress proprement
+        run: npx cypress install
+
+      - name: 🛠 Créer et ajuster les permissions du cache Cypress
+        run: |
+          mkdir -p ~/.cache/Cypress
+          chmod -R 777 ~/.cache/Cypress
+
+      - name: 🚀 Run Cypress Tests (Electron)
+        run: xvfb-run --auto-servernum -- npx cypress run 
         env:
           DISPLAY: ':99.0'
           CYPRESS_CACHE_FOLDER: '${{ github.workspace }}/.cache/Cypress'
