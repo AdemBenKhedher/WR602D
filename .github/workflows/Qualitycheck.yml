@@ -87,4 +87,4 @@ jobs:
         run: xvfb-run --auto-servernum -- npm run cypress:run
         env:
           DISPLAY: ':99.0'
-          CYPRESS_BASE_URL: 'http://localhost:8000'
+          CYPRESS_BASE_URL: 'http://symfony.mmi-troyes.fr:8319'
