@@ -40,7 +40,7 @@ jobs:
 
       - name: 🚨 Run PHPMD (Mess Detector)
         run: vendor/bin/phpmd src/ text cleancode,codesize,controversial,design
-        
+
   cypress_tests:
     name: Run Cypress Tests
     runs-on: ubuntu-latest
@@ -53,7 +53,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev \
-            libasound2 libnss3 libxss1 libxtst6 xauth xvfb
+            libnss3 libxss1 libxtst6 xauth xvfb \
+            $(apt-cache search libasound2 | awk '{print $1}' | grep '^libasound2')
 
       - name: 🛠 Set up Node.js
         uses: actions/setup-node@v3
