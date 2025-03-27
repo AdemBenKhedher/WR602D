@@ -49,9 +49,7 @@ jobs:
       - name: 🛠 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🚀 Start Symfony server
-        run: symfony server:start --port=8319 --daemon
-  
+
       - name: 🛠 Install dependencies
         run: |
           sudo apt-get update
@@ -67,6 +65,9 @@ jobs:
 
       - name: 📦 Install Node dependencies
         run: npm ci
+
+      - name: 🚀 Start Symfony server
+        run: symfony server:start --port=8319 --daemon
 
       - name: 🚀 Run Cypress Tests
         run: xvfb-run --auto-servernum -- npm run cypress:run
