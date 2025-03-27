@@ -49,7 +49,6 @@ jobs:
       - name: 🛠 Checkout Repository
         uses: actions/checkout@v4
 
-
       - name: 🛠 Install dependencies
         run: |
           sudo apt-get update
@@ -65,8 +64,20 @@ jobs:
 
       - name: 📦 Install Node dependencies
         run: npm ci
+        
+      - name: 🛠 Créer et configurer les permissions pour le cache Cypress
+        run: |
+          mkdir -p $HOME/.cache/Cypress
+          chmod -R 777 $HOME/.cache/Cypress
+
+      - name: 🚀 Démarrer le serveur local
+        run: |
+          php -S localhost:8000 -t public/ &
+          sleep 5 # Attendre que le serveur démarre
 
       - name: 🚀 Run Cypress Tests
         run: xvfb-run --auto-servernum -- npm run cypress:run
         env:
           DISPLAY: ':99.0'
+          CYPRESS_CACHE_FOLDER: '$HOME/.cache/Cypress'
+          CYPRESS_BASE_URL: 'http://localhost:8000'
