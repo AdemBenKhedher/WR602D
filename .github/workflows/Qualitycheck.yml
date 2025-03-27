@@ -65,6 +65,9 @@ jobs:
 
       - name: 📦 Install Node dependencies
         run: npm ci
+        
+      - name: Fix Cypress permissions
+        run: sudo chmod -R 777 ~/.cache/Cypress
 
       - name: 🚀 Run Cypress Tests
         run: xvfb-run --auto-servernum -- npm run cypress:run
