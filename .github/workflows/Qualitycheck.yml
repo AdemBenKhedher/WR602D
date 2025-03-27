@@ -62,13 +62,21 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
+      # Ajout du cache pour Cypress
+      - name: 📦 Cache Cypress binary
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-binary-${{ hashFiles('package-lock.json') }}
+          restore-keys: cypress-binary-
+
       - name: 📦 Install Node dependencies
         run: npm ci
         
-      - name: 🛠 Créer et configurer les permissions pour le cache Cypress
+      - name: 🛠 Set permissions for Cypress cache
         run: |
-          mkdir -p $HOME/.cache/Cypress
-          chmod -R 777 $HOME/.cache/Cypress
+          mkdir -p ~/.cache/Cypress
+          chmod -R 777 ~/.cache/Cypress
 
       - name: 🚀 Démarrer le serveur local
         run: |
@@ -79,5 +87,4 @@ jobs:
         run: xvfb-run --auto-servernum -- npm run cypress:run
         env:
           DISPLAY: ':99.0'
-          CYPRESS_CACHE_FOLDER: '$HOME/.cache/Cypress'
           CYPRESS_BASE_URL: 'http://localhost:8000'
