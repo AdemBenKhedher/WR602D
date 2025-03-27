@@ -80,7 +80,7 @@ jobs:
 
       - name: 🚀 Démarrer le serveur local
         run: |
-          php -S localhost:8000 -t public/ &
+          php -S symfony.mmi-troyes.fr:8319 -t public/ &
           sleep 5 # Attendre que le serveur démarre
 
       - name: 🚀 Run Cypress Tests
