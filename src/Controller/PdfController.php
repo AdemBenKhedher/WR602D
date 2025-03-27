@@ -35,7 +35,12 @@ class PdfController extends AbstractController
                 return $this->redirectToRoute('app_pdf');
             }
 
-            return $this->redirectToRoute('app_pdf_display', ['url' => $url]);
+            return $this->redirectToRoute('app_pdf_open_new_tab', ['url' => $url]);
+        }
+
+        $returnFromPdf = $request->query->get('returned');
+        if ($returnFromPdf) {
+            $this->addFlash('success', 'PDF généré avec succès! Vous pouvez générer un autre PDF.');
         }
 
         return $this->render('pdf/generate_pdf.html.twig', [
@@ -48,6 +53,23 @@ class PdfController extends AbstractController
     {
         $url = $request->query->get('url');
 
+
         return $this->pdfService->generatePdfFromUrl($url);
+    }
+
+    #[Route('/pdf/return', name: 'app_pdf_return')]
+    public function returnFromPdf(): Response
+    {
+        return $this->redirectToRoute('app_pdf', ['returned' => true]);
+    }
+
+    #[Route('/pdf/open-new-tab', name: 'app_pdf_open_new_tab')]
+    public function openPdfNewTab(Request $request): Response
+    {
+        $url = $request->query->get('url');
+
+        return $this->render('pdf/open_new_tab.html.twig', [
+            'pdf_url' => $this->generateUrl('app_pdf_display', ['url' => $url])
+        ]);
     }
 }

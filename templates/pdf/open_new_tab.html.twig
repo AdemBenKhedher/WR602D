@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Votre PDF est prêt{% endblock %}
+
+{% block body %}
+    <div class="pdf-redirect-container">
+        <div class="success-message">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h1>Votre PDF a été généré avec succès</h1>
+        </div>
+        
+        <div class="pdf-actions">
+            <a href="{{ pdf_url }}" target="_blank" id="pdf-link" class="pdf-button">
+                <i class="fas fa-file-pdf"></i> Ouvrir le PDF
+            </a>
+            
+            <a href="{{ path('app_pdf_return') }}" class="return-button">
+                <i class="fas fa-arrow-left"></i> Retour à la page de génération
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .pdf-redirect-container {
+            max-width: 800px;
+            margin: 2.5rem auto;
+            padding: 2.5rem;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        
+        .success-message {
+            background-color: #d1fae5;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 5px solid #10b981;
+            text-align: left;
+        }
+        
+        .success-icon {
+            color: #10b981;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        h1 {
+            color: #065f46;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+        
+        .pdf-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .pdf-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.25);
+        }
+        
+        .pdf-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(79, 70, 229, 0.3);
+        }
+        
+        .return-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .return-button:hover {
+            background-color: #e5e7eb;
+            color: #111827;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

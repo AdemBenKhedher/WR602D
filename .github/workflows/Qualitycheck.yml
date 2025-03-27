@@ -1,4 +1,4 @@
-name: PHP Quality Checks
+name: PHP & Cypress Quality Checks
 
 on: 
   push:
@@ -33,11 +33,39 @@ jobs:
         run: vendor/bin/phpcs --standard=PSR12 src/
 
       - name: 🔍 Run PHPStan (Static Analysis)
-        run: vendor/bin/phpstan analyse src/ 
+        run: vendor/bin/phpstan analyse src/
 
       - name: 🧪 Run PHPUnit Tests
         run: vendor/bin/phpunit tests/
 
       - name: 🚨 Run PHPMD (Mess Detector)
         run: vendor/bin/phpmd src/ text cleancode,codesize,controversial,design
-      
+
+  cypress_tests:
+    name: Run Cypress Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🛠 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🛠 Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev \
+            libasound2 libnss3 libxss1 libxtst6 xauth xvfb
+
+      - name: 🛠 Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📦 Install Node dependencies
+        run: npm ci
+
+      - name: 🚀 Run Cypress Tests
+        run: xvfb-run --auto-servernum -- npm run cypress:run
+        env:
+          DISPLAY: ':99.0'
+          CYPRESS_CACHE_FOLDER: '/root/.cache/Cypress'
